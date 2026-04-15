@@ -1,4 +1,4 @@
-name: Build iOS
+name: 构建iOS安装包
 
 on:
   push:
@@ -10,25 +10,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Flutter
+      - name: 安装Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: stable
-          cache: true
 
-      - name: Install dependencies
+      - name: 获取依赖
         run: flutter pub get
 
-      - name: Build iOS (仅生成.app，不签名)
-        run: flutter build ios --release --no-codesign --dart-define=CI=true
+      - name: 构建iOS应用
+        run: flutter build ios --no-codesign
 
-      - name: 打包IPA (用xcodebuild无签名打包)
+      - name: 打包成IPA
         run: |
-          xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release -archivePath build/Runner.xcarchive archive
-          xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportPath build/ipa -exportOptionsPlist ios/ExportOptions.plist
+          mkdir Payload
+          cp -r build/ios/Release-iphoneos/Runner.app Payload/
+          zip -r app.ipa Payload
 
-      - name: Upload IPA
+      - name: 上传安装包
         uses: actions/upload-artifact@v4
         with:
           name: app
-          path: build/ipa/Runner.ipa
+          path: app.ipa
