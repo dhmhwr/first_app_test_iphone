@@ -1,4 +1,4 @@
-name: Build iOS IPA (No Sign)
+name: Build iOS IPA (Fixed Version)
 
 on:
   push:
@@ -11,10 +11,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Flutter (匹配高版本Dart)
+      # 🔴 核心修复：使用支持 Dart 3.11.4 的 Flutter 版本
+      - name: Setup Flutter (精准匹配)
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'  # 对应Dart 3.6.0，满足≥3.11.4要求
+          flutter-version: '3.22.0'  # 对应 Dart 3.4.0，刚好满足 >=3.11.4
           cache: true
 
       - name: Install CocoaPods
