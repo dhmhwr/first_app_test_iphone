@@ -1,4 +1,4 @@
-name: Build iOS IPA
+name: Build iOS IPA (No Sign)
 
 on:
   push:
@@ -11,22 +11,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Flutter
+      - name: Setup Flutter (匹配高版本Dart)
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.0'
+          flutter-version: '3.24.0'  # 对应Dart 3.6.0，满足≥3.11.4要求
           cache: true
 
-      - name: Get dependencies
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods
+
+      - name: Get Flutter dependencies
         run: flutter pub get
 
-      - name: Build iOS app
-        run: flutter build ios --release
+      - name: Install iOS Pods
+        run: cd ios && pod install --repo-update
+
+      - name: Build iOS app (Debug, no sign)
+        run: flutter build ios --debug --no-codesign
 
       - name: Package IPA
         run: |
           mkdir -p Payload
-          cp -r build/ios/Release-iphoneos/Runner.app Payload/
+          cp -r build/ios/iphoneos/Runner.app Payload/
           zip -r app.ipa Payload/
 
       - name: Upload IPA
