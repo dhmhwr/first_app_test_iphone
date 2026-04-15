@@ -1,0 +1,37 @@
+name: Build iOS
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: stable
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build iOS
+        run: flutter build ios --release --no-codesign
+
+      - name: Create Payload folder
+        run: mkdir Payload
+
+      - name: Move app
+        run: mv build/ios/Release-iphoneos/Runner.app Payload/Runner.app
+
+      - name: Zip to IPA
+        run: zip -r app.ipa Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: app
+          path: app.ipa
