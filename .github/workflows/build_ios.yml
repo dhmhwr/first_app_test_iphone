@@ -1,4 +1,4 @@
-name: 构建iOS安装包
+name: Build iOS IPA
 
 on:
   push:
@@ -8,26 +8,28 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: 安装Flutter
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: stable
+          flutter-version: '3.19.0'
+          cache: true
 
-      - name: 获取依赖
+      - name: Get dependencies
         run: flutter pub get
 
-      - name: 构建iOS应用
-        run: flutter build ios --no-codesign
+      - name: Build iOS app
+        run: flutter build ios --release
 
-      - name: 打包成IPA
+      - name: Package IPA
         run: |
-          mkdir Payload
+          mkdir -p Payload
           cp -r build/ios/Release-iphoneos/Runner.app Payload/
-          zip -r app.ipa Payload
+          zip -r app.ipa Payload/
 
-      - name: 上传安装包
+      - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
           name: app
