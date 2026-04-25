@@ -14,23 +14,25 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.41.6'  # 🔴 这个才是对的
+          flutter-version: '3.41.6'
           channel: 'stable'
 
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Build iOS app
+      # 关键修改：打正式 Release 包
+      - name: Build iOS app (Release)
         run: flutter build ios --release --no-codesign
 
       - name: Package IPA
         run: |
           mkdir -p Payload
           cp -r build/ios/iphoneos/Runner.app Payload/
-          zip -r app.ipa Payload/
+          zip -r 万能阅读器.ipa Payload/
 
+      # 输出文件名改为：万能阅读器
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: app
-          path: app.ipa
+          name: 万能阅读器
+          path: 万能阅读器.ipa
